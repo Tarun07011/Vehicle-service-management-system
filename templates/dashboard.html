@@ -1,0 +1,71 @@
+{% extends "base.html" %} {% set active = 'dashboard' %} {% block heading
+%}Dashboard{% endblock %} {% block content %}
+<div class="cards">
+  <div class="card">
+    <p class="card-label">Total Customers</p>
+    <p class="card-value">{{ stats.customers }}</p>
+  </div>
+  <div class="card">
+    <p class="card-label">Total Vehicles</p>
+    <p class="card-value">{{ stats.vehicles }}</p>
+  </div>
+  <div class="card">
+    <p class="card-label">Total Services</p>
+    <p class="card-value">{{ stats.services }}</p>
+  </div>
+  <div class="card">
+    <p class="card-label">Pending</p>
+    <p class="card-value">{{ stats.pending }}</p>
+  </div>
+  <div class="card">
+    <p class="card-label">In Progress</p>
+    <p class="card-value">{{ stats.in_progress }}</p>
+  </div>
+  <div class="card">
+    <p class="card-label">Completed Services</p>
+    <p class="card-value">{{ stats.completed }}</p>
+  </div>
+  <div class="card">
+    <p class="card-label">Revenue (Completed)</p>
+    <p class="card-value">&#8377;{{ '%.2f'|format(stats.revenue) }}</p>
+  </div>
+</div>
+
+<div class="panel">
+  <h3>Recent Services</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Vehicle No.</th>
+          <th>Service</th>
+          <th>Date</th>
+          <th>Cost</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in recent %}
+        <tr>
+          <td>{{ s.customer_name }}</td>
+          <td>{{ s.vehicle_number }}</td>
+          <td>{{ s.service_type }}</td>
+          <td>{{ s.service_date }}</td>
+          <td>&#8377;{{ s.cost }}</td>
+          <td>
+            <span class="badge {{ s.status|lower|replace(' ','-') }}"
+              >{{ s.status }}</span
+            >
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" class="empty">No service records yet.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
