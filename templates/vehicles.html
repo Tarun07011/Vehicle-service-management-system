@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% set active = 'vehicles' %}
+
+{% block heading %}Vehicles{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+  <h3>{{ 'Edit Vehicle' if editing else 'Add Vehicle' }}</h3>
+
+  <form
+    method="POST"
+    action="{{ url_for('save_vehicle') }}"
+    onsubmit="return validateForm(this);"
+  >
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <input
+      type="hidden"
+      name="id"
+      value="{{ editing.id if editing else '' }}"
+    />
+
+    <div class="form-grid">
+
+      <div>
+        <label>Customer *</label>
+        <select name="customer_id" required>
+          <option value="">-- Select customer --</option>
+          {% for c in customers %}
+          <option
+            value="{{ c.id }}"
+            {% if editing and editing.customer_id == c.id %}selected{% endif %}
+          >
+            {{ c.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label>Vehicle Number *</label>
+        <input
+          type="text"
+          name="vehicle_number"
+          required
+          maxlength="20"
+          placeholder="KA01AB1234"
+          value="{{ editing.vehicle_number if editing else '' }}"
+        />
+      </div>
+
+      <div>
+        <label>Model</label>
+        <input
+          type="text"
+          name="model"
+          maxlength="50"
+          value="{{ editing.model if editing and editing.model else '' }}"
+        />
+      </div>
+
+      <div>
+        <label>Type</label>
+        <select name="vehicle_type">
+          {% for t in ['Car', 'Bike', 'Scooter', 'Truck', 'Other'] %}
+          <option
+            value="{{ t }}"
+            {% if editing and editing.vehicle_type == t %}selected{% endif %}
+          >
+            {{ t }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn primary">
+        {{ 'Update' if editing else 'Add Vehicle' }}
+      </button>
+      {% if editing %}
+      <a class="btn ghost" href="{{ url_for('vehicles') }}">Cancel</a>
+      {% endif %}
+    </div>
+
+  </form>
+</div>
+
+
+<div class="panel">
+
+  <div class="panel-head">
+    <h3>Vehicle List</h3>
+
+    <a class="btn primary small" href="{{ url_for('export_vehicles') }}">Download PDF</a>
+
+    <form class="search" method="GET" action="{{ url_for('vehicles') }}">
+      <input
+        type="text"
+        name="search"
+        placeholder="Search by vehicle no. or customer"
+        value="{{ search }}"
+      />
+      <button class="btn primary" type="submit">Search</button>
+    </form>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Vehicle No.</th>
+          <th>Model</th>
+          <th>Type</th>
+          <th>Customer</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for v in vehicles %}
+        <tr>
+          <td>{{ v.id }}</td>
+          <td>{{ v.vehicle_number }}</td>
+          <td>{{ v.model or '' }}</td>
+          <td>{{ v.vehicle_type or '' }}</td>
+          <td>{{ v.customer_name }}</td>
+
+          <td class="actions">
+            <a class="btn small" href="{{ url_for('vehicles', edit=v.id) }}">Edit</a>
+
+            <form
+              method="POST"
+              action="{{ url_for('delete_vehicle', vehicle_id=v.id) }}"
+              onsubmit="return confirmDelete();"
+              style="display: inline"
+            >
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <button type="submit" class="btn small danger">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" class="empty">No vehicles found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+{% endblock %}

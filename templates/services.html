@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% set active = 'services' %}
+
+{% block heading %}Services{% endblock %}
+
+{% block content %}
+
+<div class="panel">
+  <h3>{{ 'Edit Service Record' if editing else 'Add Service Record' }}</h3>
+
+  <form
+    method="POST"
+    action="{{ url_for('save_service') }}"
+    onsubmit="return validateForm(this);"
+  >
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <input
+      type="hidden"
+      name="id"
+      value="{{ editing.id if editing else '' }}"
+    />
+
+    <div class="form-grid">
+
+      <div>
+        <label>Vehicle *</label>
+        <select name="vehicle_id" required>
+          <option value="">-- Select vehicle --</option>
+          {% for v in vehicles %}
+          <option
+            value="{{ v.id }}"
+            {% if editing and editing.vehicle_id == v.id %}selected{% endif %}
+          >
+            {{ v.vehicle_number }} ({{ v.customer_name }})
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label>Service Type *</label>
+        <input
+          type="text"
+          name="service_type"
+          required
+          maxlength="100"
+          placeholder="Oil change, Brake repair..."
+          value="{{ editing.service_type if editing else '' }}"
+        />
+      </div>
+
+      <div>
+        <label>Service Date *</label>
+        <input
+          type="date"
+          name="service_date"
+          required
+          value="{{ editing.service_date if editing else '' }}"
+        />
+      </div>
+
+      <div>
+        <label>Cost (&#8377;)</label>
+        <input
+          type="number"
+          step="0.01"
+          min="0"
+          name="cost"
+          value="{{ editing.cost if editing else '0' }}"
+        />
+      </div>
+
+      <div>
+        <label>Status</label>
+        <select name="status">
+          {% for st in statuses %}
+          <option
+            value="{{ st }}"
+            {% if editing and editing.status == st %}selected{% endif %}
+          >
+            {{ st }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn primary">
+        {{ 'Update' if editing else 'Add Service' }}
+      </button>
+      {% if editing %}
+      <a class="btn ghost" href="{{ url_for('services') }}">Cancel</a>
+      {% endif %}
+    </div>
+
+  </form>
+</div>
+
+
+<div class="panel">
+
+  <div class="panel-head">
+    <h3>Service Records</h3>
+
+    <a class="btn primary small" href="{{ url_for('export_services') }}">Download PDF</a>
+
+    <form class="search" method="GET" action="{{ url_for('services') }}">
+      <select name="status">
+        <option value="">All statuses</option>
+        {% for st in statuses %}
+        <option value="{{ st }}" {% if status_filter == st %}selected{% endif %}>{{ st }}</option>
+        {% endfor %}
+      </select>
+      <input
+        type="text"
+        name="search"
+        placeholder="Search by vehicle no. or customer"
+        value="{{ search }}"
+      />
+      <button class="btn primary" type="submit">Search</button>
+    </form>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Customer</th>
+          <th>Vehicle No.</th>
+          <th>Service</th>
+          <th>Date</th>
+          <th>Cost</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for s in services %}
+        <tr>
+          <td>{{ s.id }}</td>
+          <td>{{ s.customer_name }}</td>
+          <td>{{ s.vehicle_number }}</td>
+          <td>{{ s.service_type }}</td>
+          <td>{{ s.service_date }}</td>
+          <td>&#8377;{{ s.cost }}</td>
+          <td>
+            <span class="badge {{ s.status|lower|replace(' ','-') }}">{{ s.status }}</span>
+          </td>
+
+          <td class="actions">
+            <a class="btn small" href="{{ url_for('services', edit=s.id) }}">Edit</a>
+
+            {% if s.status == 'Completed' %}
+            <a class="btn small ghost" href="{{ url_for('service_invoice', service_id=s.id) }}">Invoice</a>
+            {% endif %}
+
+            <form
+              method="POST"
+              action="{{ url_for('delete_service', service_id=s.id) }}"
+              onsubmit="return confirmDelete();"
+              style="display: inline"
+            >
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <button type="submit" class="btn small danger">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="8" class="empty">No service records found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+{% endblock %}
+

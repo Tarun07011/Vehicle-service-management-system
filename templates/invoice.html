@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<style>
+  body { font-family: Helvetica, Arial, sans-serif; color: #1f2937; font-size: 13px; }
+  .header { width: 100%; margin-bottom: 20px; }
+  .header td { vertical-align: top; }
+  .company-name { font-size: 22px; font-weight: bold; color: #12263f; }
+  .company-name span { color: #2563eb; }
+  .invoice-title { font-size: 18px; font-weight: bold; text-align: right; color: #12263f; }
+  .muted { color: #6b7280; font-size: 11px; }
+  .section-title { font-size: 12px; font-weight: bold; color: #6b7280; margin-top: 18px; margin-bottom: 6px; text-transform: uppercase; }
+  table.details { width: 100%; border-collapse: collapse; margin-top: 6px; }
+  table.details td { padding: 6px 4px; }
+  table.items { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  table.items th { background: #f8fafc; text-align: left; padding: 8px; font-size: 11px; color: #6b7280; border-bottom: 1px solid #e2e8f0; }
+  table.items td { padding: 10px 8px; border-bottom: 1px solid #e2e8f0; }
+  .total-row td { font-weight: bold; font-size: 15px; padding-top: 14px; }
+  .footer { margin-top: 40px; font-size: 11px; color: #6b7280; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 10px; }
+</style>
+</head>
+<body>
+
+  <table class="header">
+    <tr>
+      <td>
+        <div class="company-name">Auto<span>Care</span></div>
+        <div class="muted">Vehicle Service Management</div>
+      </td>
+      <td>
+        <div class="invoice-title">SERVICE INVOICE</div>
+        <div class="muted" style="text-align:right;">Invoice No: {{ invoice_no }}</div>
+        <div class="muted" style="text-align:right;">Invoice Date: {{ invoice_date }}</div>
+      </td>
+    </tr>
+  </table>
+
+  <div class="section-title">Billed To</div>
+  <table class="details">
+    <tr><td><strong>{{ service.customer_name }}</strong></td></tr>
+    <tr><td class="muted">Phone: {{ service.phone }}</td></tr>
+    {% if service.email %}<tr><td class="muted">Email: {{ service.email }}</td></tr>{% endif %}
+    {% if service.address %}<tr><td class="muted">Address: {{ service.address }}</td></tr>{% endif %}
+  </table>
+
+  <div class="section-title">Vehicle</div>
+  <table class="details">
+    <tr>
+      <td><strong>{{ service.vehicle_number }}</strong></td>
+      <td>{{ service.model or '' }}</td>
+      <td>{{ service.vehicle_type or '' }}</td>
+    </tr>
+  </table>
+
+  <div class="section-title">Service Details</div>
+  <table class="items">
+    <tr>
+      <th>Service Type</th>
+      <th>Service Date</th>
+      <th>Status</th>
+      <th style="text-align:right;">Cost</th>
+    </tr>
+    <tr>
+      <td>{{ service.service_type }}</td>
+      <td>{{ service.service_date }}</td>
+      <td>{{ service.status }}</td>
+      <td style="text-align:right;">&#8377;{{ service.cost }}</td>
+    </tr>
+    <tr class="total-row">
+      <td colspan="3" style="text-align:right;">Total</td>
+      <td style="text-align:right;">&#8377;{{ service.cost }}</td>
+    </tr>
+  </table>
+
+  <div class="footer">
+    Thank you for choosing AutoCare. This is a computer-generated invoice.
+  </div>
+
+</body>
+</html>

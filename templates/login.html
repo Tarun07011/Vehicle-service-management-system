@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Login - Vehicle Service Management</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body class="login-page">
+    <form class="login-box" method="POST" onsubmit="return validateForm(this);">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <h2 class="logo">AUTO<span>Care</span></h2>
+      <p class="subtitle">Vehicle Service Management</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %} {% for
+      category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %} {% endwith %}
+
+      <label>Username</label>
+      <input type="text" name="username" required />
+
+      <label>Password</label>
+      <input type="password" name="password" required />
+
+      <button type="submit" class="btn primary full">Login</button>
+    </form>
+  </body>
+</html>

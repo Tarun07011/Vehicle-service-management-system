@@ -1,0 +1,125 @@
+{% extends "base.html" %} {% set active = 'customers' %} {% block heading
+%}Customers{% endblock %} {% block content %}
+<div class="panel">
+  <h3>{{ 'Edit Customer' if editing else 'Add Customer' }}</h3>
+  <form
+    method="POST"
+    action="{{ url_for('save_customer') }}"
+    onsubmit="return validateForm(this);"
+  >
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <input
+      type="hidden"
+      name="id"
+      value="{{ editing.id if editing else '' }}"
+    />
+    <div class="form-grid">
+      <div>
+        <label>Name *</label>
+        <input
+          type="text"
+          name="name"
+          required
+          maxlength="100"
+          value="{{ editing.name if editing else '' }}"
+        />
+      </div>
+      <div>
+        <label>Phone *</label>
+        <input
+          type="text"
+          name="phone"
+          required
+          maxlength="20"
+          value="{{ editing.phone if editing else '' }}"
+        />
+      </div>
+      <div>
+        <label>Email</label>
+        <input
+          type="email"
+          name="email"
+          maxlength="100"
+          value="{{ editing.email if editing and editing.email else '' }}"
+        />
+      </div>
+      <div>
+        <label>Address</label>
+        <input
+          type="text"
+          name="address"
+          maxlength="255"
+          value="{{ editing.address if editing and editing.address else '' }}"
+        />
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn primary">
+        {{ 'Update' if editing else 'Add Customer' }}
+      </button>
+      {% if editing %}<a class="btn ghost" href="{{ url_for('customers') }}"
+        >Cancel</a
+      >{% endif %}
+    </div>
+  </form>
+</div>
+
+<div class="panel">
+  <div class="panel-head">
+    <h3>Customer List</h3>
+    <form class="search" method="GET" action="{{ url_for('customers') }}">
+      <input
+        type="text"
+        name="search"
+        placeholder="Search by name or phone"
+        value="{{ search }}"
+      />
+      <button class="btn primary" type="submit">Search</button>
+    </form>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Address</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in customers %}
+        <tr>
+          <td>{{ c.id }}</td>
+          <td>{{ c.name }}</td>
+          <td>{{ c.phone }}</td>
+          <td>{{ c.email or '' }}</td>
+          <td>{{ c.address or '' }}</td>
+          <td class="actions">
+            <a class="btn small" href="{{ url_for('customers', edit=c.id) }}"
+              >Edit</a
+            >
+            <form
+              method="POST"
+              action="{{ url_for('delete_customer', customer_id=c.id) }}"
+              onsubmit="return confirmDelete();"
+              style="display: inline"
+            >
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <button type="submit" class="btn small danger">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" class="empty">No customers found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Vehicle Service Management{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <h2 class="logo">AUTO<span>Care</span></h2>
+      <nav>
+        <a
+          href="{{ url_for('dashboard') }}"
+          class="{{ 'active' if active == 'dashboard' }}"
+          >Dashboard</a
+        >
+        <a
+          href="{{ url_for('customers') }}"
+          class="{{ 'active' if active == 'customers' }}"
+          >Customers</a
+        >
+        <a
+          href="{{ url_for('vehicles') }}"
+          class="{{ 'active' if active == 'vehicles' }}"
+          >Vehicles</a
+        >
+        <a
+          href="{{ url_for('services') }}"
+          class="{{ 'active' if active == 'services' }}"
+          >Services</a
+        >
+        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+      </nav>
+    </aside>
+
+    <!-- Main area -->
+    <div class="main">
+      <header class="topbar">
+        <button class="menu-btn" onclick="toggleSidebar()">&#9776;</button>
+        <h1>{% block heading %}{% endblock %}</h1>
+        <span class="admin-tag">{{ session.get('admin') }}</span>
+      </header>
+
+      <div class="content">
+        {% with messages = get_flashed_messages(with_categories=true) %} {% for
+        category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %} {% endwith %} {% block content %}{% endblock %}
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>
